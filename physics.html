@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projectile Motion Simulator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #87ceeb, #ffffff);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        h1 {
+            color: #333;
+            margin-top: 20px;
+        }
+        .controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
+            padding: 20px;
+            background-color: #ffffff;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        label {
+            margin: 5px;
+        }
+        input {
+            margin: 5px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        canvas {
+            border: 2px solid black;
+            background: white;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Projectile Motion Simulator</h1>
+    <div class="controls">
+        <label for="velocity">Initial Velocity (m/s): </label>
+        <input type="number" id="velocity" value="50" step="1" min="1">
+        <label for="angle">Launch Angle (°): </label>
+        <input type="number" id="angle" value="45" step="1" min="1" max="90">
+        <label for="gravity">Gravity (m/s²): </label>
+        <input type="number" id="gravity" value="9.8" step="0.1" min="0.1">
+        <button onclick="startSimulation()">Start Simulation</button>
+    </div>
+    <canvas id="projectileCanvas" width="800" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById('projectileCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let velocity, angle, gravity, time;
+        let interval;
+
+        function startSimulation() {
+            // Clear any previous simulation
+            clearInterval(interval);
+
+            // Get user inputs
+            velocity = parseFloat(document.getElementById('velocity').value);
+            angle = parseFloat(document.getElementById('angle').value) * (Math.PI / 180); // Convert to radians
+            gravity = parseFloat(document.getElementById('gravity').value);
+
+            // Initialize time and start animation
+            time = 0;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawGround();
+            interval = setInterval(animateProjectile, 20);
+        }
+
+        function drawGround() {
+            ctx.fillStyle = '#4caf50'; // Green for ground
+            ctx.fillRect(0, canvas.height - 10, canvas.width, 10);
+        }
+
+        function animateProjectile() {
+            // Clear the frame
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawGround();
+
+            // Calculate position
+            const x = velocity * Math.cos(angle) * time;
+            const y = velocity * Math.sin(angle) * time - 0.5 * gravity * Math.pow(time, 2);
+
+            if (y < 0) {
+                clearInterval(interval); // Stop the animation when it hits the ground
+                return;
+            }
+
+            // Draw projectile
+            ctx.beginPath();
+            ctx.arc(x, canvas.height - y - 10, 5, 0, 2 * Math.PI);
+            ctx.fillStyle = '#ff5733'; // Orange for projectile
+            ctx.fill();
+
+            time += 0.05; // Increment time
+        }
+    </script>
+</body>
+</html>
